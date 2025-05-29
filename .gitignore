@@ -1,0 +1,3 @@
+/.dockerignore
+/metadata
+/scripts/__pycache__
