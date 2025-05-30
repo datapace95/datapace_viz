@@ -9,6 +9,9 @@ from bigquery_to_df import bigquery_to_df
 
 st.set_page_config(layout="wide")
 
+st.title("Check temps par zone d'intentisé")
+st.write("Il est conseillé de passer entre 75% et 85% du temps d'entrainement en zone 1 + zone 2 (endurance fondamentale), pour développer la capacité aérobie (et réduire le risque de blessure).")
+
 if 'df_activity_zone' not in st.session_state :
     sql_activity_zone = f"""
                             SELECT 

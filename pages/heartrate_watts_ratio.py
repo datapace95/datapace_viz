@@ -10,6 +10,15 @@ from bigquery_to_df import bigquery_to_df
 
 st.set_page_config(layout="wide")
 
+st.title("Evolution du ratio puissance vs fréquence cadriaque")
+with st.expander("détails sur le suivi") :
+    st.write("Permet de suivre l'évolution de l'économie : pour une même fréquence cardiaque, on regarde si la puissance (mesurée en watts) augmente au cours du temps.")
+    st.write("Critères des séances d'entrainements retenues pour ce suivi :")
+    st.write("- séances sur home trainer avec comme titre 'HT EF' : permet d'enlever le bruit dû aux arrêts, environnements extérieurs, etc")
+    st.write("- le titre 'HT EF' est saisi à la mano dans Strava, pour des séances d'endurance fondamentale, essentielement passée en zone 2 (donc pas d'intensité)")
+    st.write("- séances durant à minima 45min")
+    st.write("La mesure est ensuite effectuée entre la 10eme et la 45eme minute de la séance.")
+
 if 'df_ratio' not in st.session_state :
     sql_ratio = f"""
                             SELECT
@@ -71,60 +80,60 @@ with st.container(border=True) :
     # st.write(f"temps moyen par semaine (h) : {(t_tot / nb_semaines):.2f}")
     # st.write(f"Nb activités : {nb_activites}")
 
+with st.container(border=True) :
+    if df_ratio_filtered.empty:
+        st.warning("Aucune donnée disponible.")
+    else:
+        # Régression linéaire pour la courbe de tendance
+        x_num = (df_ratio_filtered['start_date_local_raw'] - df_ratio_filtered['start_date_local_raw'].min()).dt.days.values
+        y = df_ratio_filtered['watts_heartrate_ratio'].values
 
-if df_ratio_filtered.empty:
-    st.warning("Aucune donnée disponible.")
-else:
-    # Régression linéaire pour la courbe de tendance
-    x_num = (df_ratio_filtered['start_date_local_raw'] - df_ratio_filtered['start_date_local_raw'].min()).dt.days.values
-    y = df_ratio_filtered['watts_heartrate_ratio'].values
+        coef = np.polyfit(x_num, y, 1)
+        slope, intercept = coef
+        trend = slope * x_num + intercept
 
-    coef = np.polyfit(x_num, y, 1)
-    slope, intercept = coef
-    trend = slope * x_num + intercept
+        # Equation à afficher
+        equation = f"y = {slope:.4f}x + {intercept:.2f}"
 
-    # Equation à afficher
-    equation = f"y = {slope:.4f}x + {intercept:.2f}"
+        # Graphique
+        fig = go.Figure()
 
-    # Graphique
-    fig = go.Figure()
+        # Courbe réelle avec markers
+        fig.add_trace(go.Scatter(
+            x=df_ratio_filtered['start_date_local'],
+            y=df_ratio_filtered['watts_heartrate_ratio'],
+            mode='lines+markers',
+            name='Ratio (watts / bpm)',
+            line=dict(color='blue'),
+            marker=dict(size=6)
+        ))
 
-    # Courbe réelle avec markers
-    fig.add_trace(go.Scatter(
-        x=df_ratio_filtered['start_date_local'],
-        y=df_ratio_filtered['watts_heartrate_ratio'],
-        mode='lines+markers',
-        name='Ratio (watts / bpm)',
-        line=dict(color='blue'),
-        marker=dict(size=6)
-    ))
+        # Courbe de tendance
+        fig.add_trace(go.Scatter(
+            x=df_ratio_filtered['start_date_local'],
+            y=trend,
+            mode='lines',
+            name='Tendance linéaire',
+            line=dict(color='orange', dash='dash')
+        ))
 
-    # Courbe de tendance
-    fig.add_trace(go.Scatter(
-        x=df_ratio_filtered['start_date_local'],
-        y=trend,
-        mode='lines',
-        name='Tendance linéaire',
-        line=dict(color='orange', dash='dash')
-    ))
+        # Ajouter l'équation en annotation
+        fig.add_annotation(
+            x=df_ratio_filtered['start_date_local'].iloc[-1],
+            y=trend[-1],
+            text=equation,
+            showarrow=False,
+            font=dict(color='orange', size=12),
+            xanchor="left"
+        )
 
-    # Ajouter l'équation en annotation
-    fig.add_annotation(
-        x=df_ratio_filtered['start_date_local'].iloc[-1],
-        y=trend[-1],
-        text=equation,
-        showarrow=False,
-        font=dict(color='orange', size=12),
-        xanchor="left"
-    )
+        fig.update_layout(
+            xaxis_title="Date",
+            yaxis_title="Watts / Fréquence cardiaque",
+            plot_bgcolor='rgba(0,0,0,0)',
+            margin=dict(l=40, r=40, t=40, b=40),
+            height=500,
+            legend=dict(x=0.5, y=1.1, orientation="h", xanchor="center")
+        )
 
-    fig.update_layout(
-        xaxis_title="Date",
-        yaxis_title="Watts / Fréquence cardiaque",
-        plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=40, r=40, t=40, b=40),
-        height=500,
-        legend=dict(x=0.5, y=1.1, orientation="h", xanchor="center")
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True)
