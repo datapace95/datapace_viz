@@ -137,3 +137,29 @@ with st.container(border=True) :
         )
 
         st.plotly_chart(fig, use_container_width=True)
+
+with st.container(border=True):
+    st.subheader("Estimation de la puissance à une date donnée (avec l'équation de la tendance)")
+
+    if df_ratio_filtered.empty:
+        st.info("Sélectionne une période contenant des données pour effectuer une estimation.")
+    else:
+        # Date cible pour l'estimation
+        target_date = st.date_input("📅 Date cible pour l'estimation", value=max_date, format="DD/MM/YYYY")
+
+        # Calcul du nombre de jours entre la date min et la date cible
+        df_ratio_filtered['start_date_local_raw'] = pd.to_datetime(df_ratio['start_date_local_raw']).dt.tz_localize(None)
+        x_target = (pd.to_datetime(target_date) - df_ratio_filtered['start_date_local_raw'].min()).days
+
+        # Estimation du ratio (watts/bpm) à la date cible
+        estimated_ratio = slope * x_target + intercept
+
+        # Moyenne de la FC sur la période filtrée
+        hr_avg = df_ratio_filtered['heartrate_avg'].mean()
+
+        # Estimation de la puissance
+        estimated_power = estimated_ratio * hr_avg
+
+        st.markdown(f"**Ratio estimé (watts/bpm) avec l'équation :** {estimated_ratio:.2f}")
+        st.markdown(f"**Fréquence cardiaque utilisée (moyenne période sélectionnée) :** {hr_avg:.0f} bpm")
+        st.markdown(f"### ⚡ Puissance estimée (pour la FC ci-dessus): **{estimated_power:.0f} watts**")

@@ -9,7 +9,7 @@ from bigquery_to_df import bigquery_to_df
 
 st.set_page_config(layout="wide")
 
-st.title("Check temps par zone d'intentisé")
+st.title("Check du temps passé par zone d'intensité")
 st.write("Il est conseillé de passer entre 75% et 85% du temps d'entrainement en zone 1 + zone 2 (endurance fondamentale), pour développer la capacité aérobie (et réduire le risque de blessure).")
 
 if 'df_activity_zone' not in st.session_state :
@@ -182,7 +182,7 @@ with st.container(border=True) :
         # Layout
         fig.update_layout(
             xaxis=dict(
-                title='Semaine (lundi)',
+                title='Semaine (date premier jour semaine)',
                 tickangle=45,
                 tickformat="%Y-%m-%d"
             ),

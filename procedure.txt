@@ -1,0 +1,15 @@
+Pour créer l'image
+- 1 lancer docker desktop
+- 2 ouvrir terminal à la racine du projet
+- 3 executer : docker build -t eu.gcr.io/datapace-190495/datapace_viz .
+- 4 checker l'image en local en lancer le container : docker run -p 8501:8501 eu.gcr.io/datapace-190495/datapace_viz
+
+Pour envoyer le container sur Artifact Registry :
+- 5 lancer Google Cloud SDK Shell
+- 6 dans le terminal Google cloud SDK Shell : gcloud init
+- 7 docker push eu.gcr.io/datapace-190495/datapace_viz:latest
+
+pour lancer une app sur cloud run
+- 8 Dans le service cloud run cliquer sur DEPLOYER UN CONTENEUR / Service / à partir d'une image conteneur
+- 9 pour l'url du conteneur, selectionner le container dans artifact registry
+- 10 dans "port du conteneur", choisir le meme port que dans le fichier Dockerfile
