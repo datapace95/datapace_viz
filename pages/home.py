@@ -12,7 +12,7 @@ st.write("- Les données utilisées sont celles provenant de l'API proposée par
 st.write("- Elles sont récupérés par une succession de scripts Python hébergés dans un Cloud Run de GCP, qui s'occupent également de les pousser dans un Cloud Storage.")
 st.write("- Ces scripts sont lancés quotidiennements par un Cloud Scheduler.")
 st.write("- Les données sont ensuite requêtables via Big Query, dans lequel les data brutes sont accessibles via des EXTERNAL TABLES connectées au Cloud Storage.")
-st.write("- Enfin les données finales visibles dans cette App sont transformées à partir VIEWS modéliser via dbt.")
+st.write("- Enfin les données finales visibles dans cette App sont transformées à partir de VIEWS modélisées via dbt.")
 st.write("")
 st.write("")
 
@@ -20,3 +20,7 @@ st.write("Ci-dessous un schema du fonctionnement :")
 with st.container(border=True) :
     image = Image.open("pages/stack_schema.png")
     st.image(image)
+
+
+st.write("lien vers le repo git de l'app : https://github.com/datapace95/datapace_viz")
+st.write("lien vers le repo git de l'api comprenant les pipelines de donnnées : https://github.com/datapace95/datapace_viz")
