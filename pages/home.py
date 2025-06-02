@@ -23,4 +23,4 @@ with st.container(border=True) :
 
 
 st.write("lien vers le repo git de l'app : https://github.com/datapace95/datapace_viz")
-st.write("lien vers le repo git de l'api comprenant les pipelines de donnnées : https://github.com/datapace95/datapace_viz")
+st.write("lien vers le repo git de l'api comprenant les pipelines de donnnées : https://github.com/datapace95/datapace_api")
